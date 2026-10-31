@@ -1,0 +1,6 @@
+out/
+*.user
+.vs/
+.dev/config/
+bin/
+obj/

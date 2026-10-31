@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+    <title>Markdown Books</title>
+</head>
+<body>
+    <div data-role="page" class="page type-interior pluginConfigurationPage withTabs"
+         data-controllername="markdownBooksConfigPage">
+        <div class="content-primary">
+            <form class="markdownBooksConfig-form">
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">Markdown Books</h2>
+                    <p>Renders Markdown (.md) files in Books libraries. The reader view is injected into
+                    the web client through the optional &quot;File Transformation&quot; plugin — without it,
+                    Markdown books still resolve and are downloadable, but no in-browser reader is added.</p>
+                </div>
+
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label>
+                        <input is="emby-checkbox" type="checkbox" id="EnableInjection" name="EnableInjection" />
+                        <span>Inject web client reader (requires the File Transformation plugin)</span>
+                    </label>
+                </div>
+
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label>
+                        <input is="emby-checkbox" type="checkbox" id="EnableAdvancedExtensions" name="EnableAdvancedExtensions" />
+                        <span>Enable advanced Markdown extensions (tables, footnotes, task lists)</span>
+                    </label>
+                </div>
+
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label>
+                        <input is="emby-checkbox" type="checkbox" id="AllowRawHtml" name="AllowRawHtml" />
+                        <span>Allow raw HTML in Markdown files</span>
+                    </label>
+                    <div class="fieldDescription">Renders embedded HTML verbatim. Do not enable this on
+                    multi-user servers: HTML inside a Markdown library file can execute in other
+                    users' browser sessions.</div>
+                </div>
+
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label>
+                        <input is="emby-checkbox" type="checkbox" id="DebugLogging" name="DebugLogging" />
+                        <span>Debug logging</span>
+                    </label>
+                </div>
+
+                <div>
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>Save</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <script type="text/javascript">
+            (function () {
+                'use strict';
+
+                var pluginId = '06fe06de-3d34-4b4f-8935-ba729b8b8a98';
+                document.addEventListener('viewshow', function (e) {
+                    var page = e && e.detail && e.detail.element ? e.detail.element
+                        : (window.Dashboard && document.querySelector('.pluginConfigurationPage'));
+                    if (!page || !page.querySelector || !page.querySelector('.markdownBooksConfig-form')) {
+                        return;
+                    }
+                    if (page.dataset.markdownBooksLoaded === 'true') {
+                        return;
+                    }
+                    page.dataset.markdownBooksLoaded = 'true';
+
+                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                        page.querySelector('#EnableInjection').checked = config.EnableInjection;
+                        page.querySelector('#EnableAdvancedExtensions').checked = config.EnableAdvancedExtensions;
+                        page.querySelector('#AllowRawHtml').checked = config.AllowRawHtml;
+                        page.querySelector('#DebugLogging').checked = config.DebugLogging;
+                    });
+
+                    page.querySelector('.markdownBooksConfig-form').addEventListener('submit', function (ev) {
+                        ev.preventDefault();
+                        ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                            config.EnableInjection = page.querySelector('#EnableInjection').checked;
+                            config.EnableAdvancedExtensions = page.querySelector('#EnableAdvancedExtensions').checked;
+                            config.AllowRawHtml = page.querySelector('#AllowRawHtml').checked;
+                            config.DebugLogging = page.querySelector('#DebugLogging').checked;
+                            return ApiClient.updatePluginConfiguration(pluginId, config);
+                        }).then(function () {
+                            Dashboard.alert('Settings saved.');
+                        });
+                        return false;
+                    });
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

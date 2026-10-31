@@ -1,0 +1,9 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Override to build against a different Jellyfin API version (e.g. -p:JellyfinVersion=12.4.0) -->
+    <JellyfinVersion Condition="'$(JellyfinVersion)' == ''">12.0.0</JellyfinVersion>
+    <Version Condition="'$(Version)' == ''">0.1.0.0</Version>
+  </PropertyGroup>
+
+</Project>
